@@ -1,4 +1,4 @@
-![alt Screenshot](https://github.com/nck3l/dwm-6.5/dwm.png)
+![Screenshot](https://github.com/nck3l/dwm-6.5/dwm.png)
 
 dwm - dynamic window manager
 ============================

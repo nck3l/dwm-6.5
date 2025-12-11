@@ -1,5 +1,5 @@
 /* See LICENSE file for copyright and license details.
- * This config requires Nerd Fonts to display the icons
+ * This config requires Nerd Fonts to display the icons.
  *
  * Installed Patches
  * actualfullscreen-20211013-cb3f58a
@@ -13,30 +13,38 @@
 
 #include <X11/XF86keysym.h>
 #define TERMINAL "st"
-#define TERMCLASS "St"
+#define TERMCLASS "st"
 #define MODKEY Mod4Mask
 #define ALTKEY Mod1Mask
 
 /* appearance */
-static const unsigned int borderpx  = 1;        /* border pixel of windows */
+static const unsigned int borderpx  = 2;        /* border pixel of windows */
 static const Gap default_gap        = {.isgap = 1, .realgap = 5, .gappx = 0};
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
-static const char *fonts[]          = { "monospace:size=10", "Hack Nerd Font Mono:size=15" };
-static char norm_fg[]               = "#373b41";
-static char norm_bg[]               = "#1d1f21";
-static char norm_border[]           = "#373b41";
-static char sel_fg[]                = "#ffffff";
-static char sel_bg[]                = "#478061"; //7d7d7d
-static char sel_border[]            = "#70c0ba";
+static const char *fonts[]          = { "HackNerdFontPropo:size=11:antialias=true:autohint=true", "NotoColorEmoji:size=12:antialias=true:autohint=true" };
+static char norm_fg[]               = "#839496";
+static char norm_bg[]               = "#002b36";
+static char norm_border[]           = "#000000";
+static char title_fg[]              = "#2aa198";
+static char sel_bg[]                = "#c5c8c6";
+static char sel_fg[]                = "#0d597f"; //
+static char sel_border[]            = "#268bd2"; //
 static const char *colors[][3] = {
 //                      fg           bg           border
     [SchemeNorm]    = { norm_fg,    norm_bg,    norm_border },
     [SchemeSel]     = { sel_fg,     sel_bg,     sel_border },
-	[SchemeTitle]   = { sel_border, norm_bg,    norm_border },
+	[SchemeTitle]   = { title_fg,     norm_bg,    norm_border },
 };
-//UCDavis: Blue #022851 Gold #FFBF00
+
+/* PROGRAM SHORTHANDS */
+static char dmenumon[2]         = "0"; /* component of dmenucmd, manipulated in spawn() */
+static const char *dmenucmd[]   = { "dmenu_run", NULL };
+static const char *termcmd[]    = { "st", NULL};
+static const char *web[]        = { "librewolf", NULL };
+// static const char *web[]        = { "chromium", NULL };
+static const char *calc[]       = { "qalculate-qt", NULL };
 
 typedef struct {
 	const char *name;
@@ -53,14 +61,11 @@ static Sp scratchpads[] = {
 };
 
 /* Tags/Workspaces/Desktops/Groups */
-static const char *tags[] = { "", "", "", "", "" };
+static const char *tags[] = { "", "", "", "", "" };
 // Neovim, Globe, Pdf, GIMP, Dharmachakra, VoidLinux
 
-// static const char *tags[] = { "󰂣", "󰞞", "", "󰌱", "󰡶", "", "", "", "" };
-// UCDavis: Biking, Double Decker, Coffee, Shields, Vit&Enol, Plant Sci, Physical Sciences, Squirrel, Toad
-
-// static const char *tags[] = { "", "", "", "", "", "", "", "", "" };
-// Linux Distros: void, qubes, trisquel, slackware, gentoo, debian, arch, fedora, tux
+// static const char *tags[] = { "", "", "", "", "", "", "", "", "" };
+// Linux Distros: void, qubes, trisquel, slackware, gentoo, debian, arch, fedora, Alpine
 
 // static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
@@ -73,7 +78,8 @@ static const Rule rules[] = {
 	{ "Gimp",               NULL,           NULL,       1<<3,            1,           -1 },
 	{ "Zathura",            NULL,           NULL,       1<<2,            0,           -1 },
 	{ "Chromium",           NULL,           NULL,       1<<1,            0,           -1 },
-    { "qutebrowser",        NULL,           NULL,       1<<1,            0,           -1 },
+	{ "Firefox",            NULL,           NULL,       1<<1,            0,           -1 },
+	{ "librewolf",          NULL,           NULL,       1<<1,            0,           -1 },
     { "qalculate-qt",       NULL,           NULL,       0,               1,           -1 },
 	{ NULL,		            "spterm",		NULL,		SPTAG(0),	 	 1,			  -1 },
 	{ NULL,		            "spmusic",	    NULL,		SPTAG(1),		 1,			  -1 },
@@ -104,14 +110,6 @@ static const Layout layouts[] = {
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
-/* PROGRAM COMMANDS */
-static char dmenumon[2]         = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[]   = { "dmenu_run", NULL };
-static const char *termcmd[]    = { "st", NULL};
-static const char *web[]        = { "chromium", NULL };
-static const char *web2[]       = { "qutebrowser", NULL };
-static const char *calc[]       = { "qalculate-qt", NULL };
-
 /* add functionality for the volume controls, using WirePlumber/Pipewire */
 static const char *upvol[]      = { "/usr/bin/wpctl",   "set-volume", "@DEFAULT_AUDIO_SINK@",      "2%+",    NULL };
 static const char *downvol[]    = { "/usr/bin/wpctl",   "set-volume", "@DEFAULT_AUDIO_SINK@",      "2%-",    NULL };
@@ -135,7 +133,6 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_w,       togglebar,      {0} }, // turn the top bar on/off
 //    { MODKEY,                       XK_v,       spawn,          ) },
 	{ MODKEY,                       XK_b,       spawn,          {.v = web } }, // Chromium
-    { MODKEY|ShiftMask,             XK_b,       spawn,          {.v = web2 } }, // Qutebrowser
     { MODKEY,                       XK_x,       spawn,          SHCMD( "slock" ) }, // Screen locker
 	{ MODKEY,                       XK_Tab,     view,           {0} }, // Switch b/w last 2 focused windows
  	{ MODKEY,			            XK_F9,      spawn,          {.v = (const char*[]){ "mounter", NULL } } },
@@ -146,7 +143,6 @@ static const Key keys[] = {
     { MODKEY|ControlMask,           XK_p,       spawn,          SHCMD( "ffmpeg -f video4linux2 -s 640x480 -i /dev/video0 -ss 0:0:2 -frames 1 ~/Pictures/Screenshots/selfie.jpg && notify-send \"Photo Taken\"" ) },
 // Help Docs
     { 0,                  XF86XK_Launch1,       spawn,          SHCMD( "zathura ~/help/KeyBindings.pdf" ) }, // dwm KeyBindings Cheatsheet
-	{ MODKEY|ShiftMask,             XK_w,       spawn,          SHCMD( "nsxiv ~/help/qb-ref.png" ) }, // Qutebrowser Cheatsheet
     { MODKEY|ControlMask,           XK_v,       spawn,          SHCMD( "zathura ~/help/VimShortcuts.pdf" ) }, // Neovim KeyBindings Cheatsheet
     { MODKEY,                       XK_F2,      spawn,          SHCMD( "zathura ~/help/lshort.pdf" ) }, // LaTeX Short Start Guide
     { MODKEY,                       XK_n,       spawn,          SHCMD( "zathura ~/Documents/MartialArts/Notebook/Notebook.pdf" ) },
@@ -190,7 +186,7 @@ static const Key keys[] = {
 	{ ShiftMask,                    XF86XK_AudioPlay,                   spawn,      {.v = (const char*[]){ "rmpc", "pause", NULL } } },
 	{ 0,                            XF86XK_AudioPlay,                   spawn,      {.v = (const char*[]){ "rmpc", "play", NULL } } },
 	{ 0,                            XF86XK_AudioStop,                   spawn,      {.v = (const char*[]){ "rmpc", "stop", NULL } } },
-    { 0,                            XK_F2,                              spawn,      SHCMD( "feh --bg-scale --random ~/Pictures/Wallpapers/" ) }, // Set a new Random wallpaper
+    { 0,                            XK_F2,                              spawn,      SHCMD( "feh --bg-fill --random ~/Pictures/Wallpapers/" ) }, // Set a new Random wallpaper
 	TAGKEYS(                        XK_1,                       0)
 	TAGKEYS(                        XK_2,                       1)
 	TAGKEYS(                        XK_3,                       2)

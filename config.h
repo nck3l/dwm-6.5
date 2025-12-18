@@ -35,7 +35,7 @@ static const char *colors[][3] = {
 //                      fg           bg           border
     [SchemeNorm]    = { norm_fg,    norm_bg,    norm_border },
     [SchemeSel]     = { sel_fg,     sel_bg,     sel_border },
-	[SchemeTitle]   = { title_fg,     norm_bg,    norm_border },
+	[SchemeTitle]   = { title_fg,   norm_bg,    norm_border },
 };
 
 /* PROGRAM SHORTHANDS */
@@ -62,7 +62,7 @@ static Sp scratchpads[] = {
 
 /* Tags/Workspaces/Desktops/Groups */
 static const char *tags[] = { "", "", "", "", "" };
-// Neovim, Globe, Pdf, GIMP, Dharmachakra, VoidLinux
+// Neovim, Firefox, Pdf, GIMP, Dharmachakra, AlpineLinux
 
 // static const char *tags[] = { "", "", "", "", "", "", "", "", "" };
 // Linux Distros: void, qubes, trisquel, slackware, gentoo, debian, arch, fedora, Alpine
@@ -81,9 +81,11 @@ static const Rule rules[] = {
 	{ "Firefox",            NULL,           NULL,       1<<1,            0,           -1 },
 	{ "librewolf",          NULL,           NULL,       1<<1,            0,           -1 },
     { "qalculate-qt",       NULL,           NULL,       0,               1,           -1 },
+	{ "mpv",                NULL,           NULL,       0,               1,           -1 },
+	{ "Qemu-system-x86_64", NULL,           NULL,       1<<4,            1,           -1 },
 	{ NULL,		            "spterm",		NULL,		SPTAG(0),	 	 1,			  -1 },
 	{ NULL,		            "spmusic",	    NULL,		SPTAG(1),		 1,			  -1 },
-	{ NULL,		            "spfm",	        NULL,		SPTAG(2),		 0,			  -1 },
+	{ NULL,		            "spfm",	        NULL,		SPTAG(2),		 1,			  -1 },
 };
 
 /* layout(s) */
@@ -124,27 +126,28 @@ static const Key keys[] = {
 	/* modifier                     key         function        argument */
 // Program related KeyBindings
     { MODKEY|ShiftMask,          XK_BackSpace,  quit,           {0} }, // Close DWM / Exit back to TTY terminal
-    { MODKEY,                       XK_Return,  spawn,          {.v = termcmd } }, // st terminal emulator
+    { MODKEY,                       XK_Return,  spawn,          {.v = termcmd } }, // Terminal emulator of choice
 	{ MODKEY,                       XK_r,       spawn,          {.v = dmenucmd } }, // dmenu
     { MODKEY,                       XK_c,       spawn,          {.v = calc } }, // Qaclculate
-    { MODKEY,                       XK_f,       spawn,          SHCMD( "qtfm" ) }, // QT File Manager
+//    { MODKEY,                       XK_f,       spawn,          SHCMD( "" ) }, //
 	{ MODKEY,                       XK_g,       spawn,          SHCMD( "gimp" ) }, // GNU Image Manipulation Program
 	{ MODKEY,                       XK_q,       killclient,     {0} }, // close the window with focus
-	{ MODKEY,                       XK_w,       togglebar,      {0} }, // turn the top bar on/off
-//    { MODKEY,                       XK_v,       spawn,          ) },
-	{ MODKEY,                       XK_b,       spawn,          {.v = web } }, // Chromium
-    { MODKEY,                       XK_x,       spawn,          SHCMD( "slock" ) }, // Screen locker
+	{ MODKEY,                       XK_b,       togglebar,      {0} }, // turn the top bar on/off
+	{ MODKEY,                       XK_w,       spawn,          {.v = web } }, // Web Browser of choice
+    { 0,                            XK_F2,      spawn,          SHCMD( "slock" ) }, // Screen locker
 	{ MODKEY,                       XK_Tab,     view,           {0} }, // Switch b/w last 2 focused windows
- 	{ MODKEY,			            XK_F9,      spawn,          {.v = (const char*[]){ "mounter", NULL } } },
-	{ MODKEY,       			    XK_F10,     spawn,          {.v = (const char*[]){ "unmounter", NULL } } },
+ 	{ MODKEY,			            XK_m,       spawn,          {.v = (const char*[]){ "mounter", NULL } } },
+	{ MODKEY|ALTKEY,  			    XK_m,       spawn,          {.v = (const char*[]){ "unmounter", NULL } } },
 // Camera/Video
-    { MODKEY,                       XK_p,       spawn,          SHCMD( "maim -i $(xdotool getactivewindow) ~/Pictures/Screenshots/window-$(date '+%y%m%d-%H%M-%S').png && notify-send \"Screenshot Taken\"" ) },
-    { MODKEY|ShiftMask,             XK_p,       spawn,          SHCMD( "maim ~/Pictures/Screenshots/screen-$(date '+%y%m%d-%H%M-%S').png && notify-send \"Screenshot Taken\"" ) },
-    { MODKEY|ControlMask,           XK_p,       spawn,          SHCMD( "ffmpeg -f video4linux2 -s 640x480 -i /dev/video0 -ss 0:0:2 -frames 1 ~/Pictures/Screenshots/selfie.jpg && notify-send \"Photo Taken\"" ) },
+    { MODKEY,                       XK_Print,   spawn,          SHCMD( "maim -i $(xdotool getactivewindow) ~/Pictures/Screenshots/window-$(date '+%y%m%d-%H%M-%S').png && notify-send \"Screenshot Taken\"" ) },
+    { 0,                            XK_Print,   spawn,          SHCMD( "maim ~/Pictures/Screenshots/screen-$(date '+%y%m%d-%H%M-%S').png && notify-send \"Screenshot Taken\"" ) },
+//    { MODKEY|ControlMask,           XK_p,       spawn,          SHCMD( "ffmpeg -f video4linux2 -s 640x480 -i /dev/video0 -ss 0:0:2 -frames 1 ~/Pictures/Screenshots/selfie.jpg && notify-send \"Photo Taken\"" ) },
+    { MODKEY,                       XK_v,       spawn,          {.v = (const char*[]){ "dmenurecord", NULL } } },// Luke Smith's screencasting dmenu script
+    { MODKEY|ControlMask,           XK_v,       spawn,          {.v = (const char*[]){ "dmenurecord", "kill", NULL } } },
 // Help Docs
-    { 0,                  XF86XK_Launch1,       spawn,          SHCMD( "zathura ~/help/KeyBindings.pdf" ) }, // dwm KeyBindings Cheatsheet
+    { 0,                            XK_F1,      spawn,          SHCMD( "zathura ~/help/KeyBindings.pdf" ) }, // dwm KeyBindings Cheatsheet
     { MODKEY|ControlMask,           XK_v,       spawn,          SHCMD( "zathura ~/help/VimShortcuts.pdf" ) }, // Neovim KeyBindings Cheatsheet
-    { MODKEY,                       XK_F2,      spawn,          SHCMD( "zathura ~/help/lshort.pdf" ) }, // LaTeX Short Start Guide
+    { MODKEY|ControlMask,           XK_l,       spawn,          SHCMD( "zathura ~/help/lshort.pdf" ) }, // LaTeX Short Start Guide
     { MODKEY,                       XK_n,       spawn,          SHCMD( "zathura ~/Documents/MartialArts/Notebook/Notebook.pdf" ) },
 // ScratchPads
 	{ 0,            			    XK_F9,  	togglescratch,  {.ui = 0 } },
@@ -186,16 +189,16 @@ static const Key keys[] = {
 	{ ShiftMask,                    XF86XK_AudioPlay,                   spawn,      {.v = (const char*[]){ "rmpc", "pause", NULL } } },
 	{ 0,                            XF86XK_AudioPlay,                   spawn,      {.v = (const char*[]){ "rmpc", "play", NULL } } },
 	{ 0,                            XF86XK_AudioStop,                   spawn,      {.v = (const char*[]){ "rmpc", "stop", NULL } } },
-    { 0,                            XK_F2,                              spawn,      SHCMD( "feh --bg-fill --random ~/Pictures/Wallpapers/" ) }, // Set a new Random wallpaper
+    { 0,                            XK_F7,                              spawn,      SHCMD( "feh --bg-fill --random ~/Pictures/Wallpapers/" ) }, // Set a new Random wallpaper
 	TAGKEYS(                        XK_1,                       0)
 	TAGKEYS(                        XK_2,                       1)
 	TAGKEYS(                        XK_3,                       2)
 	TAGKEYS(                        XK_4,                       3)
 	TAGKEYS(                        XK_5,                       4)
-	TAGKEYS(                        XK_6,                       5)
-	TAGKEYS(                        XK_7,                       6)
-	TAGKEYS(                        XK_8,                       7)
-	TAGKEYS(                        XK_9,                       8)
+//	TAGKEYS(                        XK_6,                       5)
+//	TAGKEYS(                        XK_7,                       6)
+//	TAGKEYS(                        XK_8,                       7)
+//	TAGKEYS(                        XK_9,                       8)
 	{ MODKEY,                       XK_comma,   focusmon,       {.i = -1 } },
 	{ MODKEY,                       XK_period,  focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,   tagmon,         {.i = -1 } },
